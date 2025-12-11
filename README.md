@@ -223,7 +223,7 @@ You'll be prompted with a few questions to complete the changelog.
 Once the Pull Request is merged into `master`, a new Pull Request will automatically be opened by a changesets bot that bumps the package version and updates the `CHANGELOG.md` file.
 You'll have to manually merge this new PR to complete the workflow.
 
-If an `NPM_TOKEN` secret is included in the repository secrets, Changesets will automatically deploy the new package version to npm.
+You can set up Changesets to automatically deploy the new package version to npm.
 See [how to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm) for more info.
 
 #### How to enable Continuous Deployment with Changesets
@@ -239,13 +239,8 @@ Enabling this setting for your organization account (`Account Settings > Actions
 
 #### How to automatically deploy updates to npm
 
-As mentioned before, Changesets will automatically deploy the new package version to npm if an `NPM_TOKEN` secret is provided.
+The `Release` GitHub Action uses OpenID Connect to authenticate with npm, allowing automatic deployments without the need to store any secret in your repository.
 
-This npm token should be:
+To enable deployments to npm, [configure the GitHub repository as a Trusted Publisher](https://docs.npmjs.com/trusted-publishers) and Changesets will take care of the rest.
 
-- From Finsweet's npm organization if this repository is meant for internal/product development.
-- From a client's npm organization if this repository is meant for client development. In this case, you should ask the client to [create an npm account](https://www.npmjs.com/signup) and provide you the credentials (or the npm token, if they know how to get it).
-
-Once you're logged into the npm account, you can get an access token by following [this guide](https://docs.npmjs.com/creating-and-viewing-access-tokens).
-
-The access token must be then placed in a [repository secret](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-encrypted-secrets-for-your-repository-and-organization-for-codespaces#adding-secrets-for-a-repository) named `NPM_TOKEN`.
+If this is the first time deploying to npm from this repository, you might need to [manually publish the first version of the package](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages#publishing-scoped-public-packages).
