@@ -191,56 +191,37 @@ This template contains a set of predefined scripts in the `package.json` file:
 - `pnpm release`: This command is defined for [Changesets](https://github.com/changesets/changesets). You don't have to interact with it.
 - `pnpm run update`: Scans the dependencies of the project and provides an interactive UI to select the ones that you want to update.
 
-## CI/CD
+## Release Process
 
-This template contains a set of helpers with proper CI/CD workflows.
+To create and publish a new version:
 
-### Continuous Integration
+1. **Create a changeset** - Document your changes
+   ```bash
+   pnpm changeset
+   ```
+   This opens an interactive prompt where you'll:
+   - Select the version bump type (patch/minor/major)
+   - Write a summary of your changes
+   - A changeset file will be created in `.changeset/`
 
-When you open a Pull Request, a Continuous Integration workflow will run to:
+2. **Update version** - Apply the changeset to bump version numbers
+   ```bash
+   pnpm changeset version
+   ```
+   This will:
+   - Update the version in `package.json`
+   - Update the `CHANGELOG.md` file
+   - Delete the changeset file
 
-- Lint & check your code. It uses the `pnpm lint` and `pnpm check` commands under the hood.
-- Run the automated tests. It uses the `pnpm test` command under the hood.
+3. **Create and push a git tag** - Tag the release and push to remote
+   ```bash
+   git tag v0.0.1
+   git push origin v0.0.1
+   ```
+   Replace `v0.0.1` with your new version number
 
-If any of these jobs fail, you will get a warning in your Pull Request and should try to fix your code accordingly.
-
-**Note:** If your project doesn't contain any defined tests in the `/tests` folder, you can skip the Tests workflow job by commenting it out in the `.github/workflows/ci.yml` file. This will significantly improve the workflow running times.
-
-### Continuous Deployment
-
-[Changesets](https://github.com/changesets/changesets) allows us to generate automatic changelog updates when merging a Pull Request to the `master` branch.
-
-Before starting, make sure to [enable full compatibility with Changesets in the repository](#how-to-enable-continuous-deployment-with-changesets).
-
-To generate a new changelog, run:
-
-```bash
-pnpm changeset
-```
-
-You'll be prompted with a few questions to complete the changelog.
-
-Once the Pull Request is merged into `master`, a new Pull Request will automatically be opened by a changesets bot that bumps the package version and updates the `CHANGELOG.md` file.
-You'll have to manually merge this new PR to complete the workflow.
-
-You can set up Changesets to automatically deploy the new package version to npm.
-See [how to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm) for more info.
-
-#### How to enable Continuous Deployment with Changesets
-
-Some repositories may not have the required permissions to let Changesets interact with the repository.
-
-To enable full compatibility with Changesets, go to the repository settings (`Settings > Actions > General > Workflow Permissions`) and define:
-
-- ✅ Read and write permissions.
-- ✅ Allow GitHub Actions to create and approve pull requests.
-
-Enabling this setting for your organization account (`Account Settings > Actions > General`) could help streamline the process. By doing so, any new repos created under the org will automatically inherit the setting, which can save your teammates time and effort. This can only be applied to organization accounts at the time.
-
-#### How to automatically deploy updates to npm
-
-The `Release` GitHub Action uses OpenID Connect to authenticate with npm, allowing automatic deployments without the need to store any secret in your repository.
-
-To enable deployments to npm, [configure the GitHub repository as a Trusted Publisher](https://docs.npmjs.com/trusted-publishers) and Changesets will take care of the rest.
-
-If this is the first time deploying to npm from this repository, you might need to [manually publish the first version of the package](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages#publishing-scoped-public-packages).
+4. **Update Webflow script tag** - Use the new version in your Webflow project
+   ```html
+   <script src="https://cdn.jsdelivr.net/gh/BX-Studio-Webflow/mega-menu-animation@v0.0.1/dist/index.js"></script>
+   ```
+   Update the version number in the `@v0.0.1` part of the URL to match your release
