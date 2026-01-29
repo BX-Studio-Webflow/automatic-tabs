@@ -1,0 +1,52 @@
+/* src/styles/accordion-animations.css */
+[dev-target=accordion-animation-track] {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+[dev-target=accordion-animation-fill] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: currentColor;
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
+[dev-target=accordion].is-active [dev-target=accordion-title] {
+  opacity: 1;
+  font-weight: 600;
+}
+[dev-target=accordion].is-active [dev-target=accordion-message] {
+  opacity: 1;
+}
+[dev-target=accordion].is-active [dev-target=accordion-animation-fill] {
+  opacity: 1;
+}
+[dev-target=accordion]:not(.is-active) [dev-target=accordion-title] {
+  opacity: 0.6;
+}
+[dev-target=accordion]:not(.is-active) [dev-target=accordion-message] {
+  opacity: 0.5;
+  display: none;
+}
+[dev-target=accordion]:not(.is-active) [dev-target=accordion-animation-fill] {
+  opacity: 0;
+}
+[dev-target=accordion-title],
+[dev-target=accordion-message] {
+  transition: opacity 0.3s ease;
+}
+[dev-target=accordion] {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+[dev-target=accordion]:hover {
+  transform: translateX(4px);
+}
+/*# sourceMappingURL=index.css.map */

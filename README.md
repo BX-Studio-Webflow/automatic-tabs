@@ -1,11 +1,14 @@
-# Finsweet Developer Starter
+# Automatic Accordion
 
-A starter template for both Client & Power projects.
-
-Before starting to work with this template, please take some time to read through the documentation.
+An automatic accordion component with smooth progress animations that cycles through tabs every 10 seconds.
 
 ## Reference
 
+- [Using the Accordion](#using-the-accordion)
+  - [HTML Structure](#html-structure)
+  - [Required Attributes](#required-attributes)
+  - [Integration](#integration)
+  - [Customization](#customization)
 - [Included tools](#included-tools)
 - [Requirements](#requirements)
 - [Getting started](#getting-started)
@@ -20,6 +23,85 @@ Before starting to work with this template, please take some time to read throug
   - [Continuous Integration](#continuous-integration)
   - [Continuous Deployment](#continuous-deployment)
   - [How to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm)
+
+## Using the Accordion
+
+The automatic accordion cycles through tabs every 10 seconds with a smooth progress bar animation.
+
+### HTML Structure
+
+Each accordion item requires the following structure:
+
+```html
+<div dev-target="accordion" class="flex-vertical gap-1">
+  <h3 dev-target="accordion-title" class="work-side-title">Tab Title</h3>
+  <div dev-target="accordion-message" class="work-side-subtitle">
+    Tab content description goes here.
+  </div>
+  <div dev-target="accordion-animation-track" class="animation-track">
+    <div dev-target="accordion-animation-fill" class="animation-fill"></div>
+  </div>
+</div>
+```
+
+### Required Attributes
+
+All accordion items **must** include these `dev-target` attributes:
+
+- `dev-target="accordion"` - Main accordion container
+- `dev-target="accordion-title"` - Tab title element
+- `dev-target="accordion-message"` - Tab content/description
+- `dev-target="accordion-animation-track"` - Progress bar container
+- `dev-target="accordion-animation-fill"` - Progress bar fill element
+
+⚠️ **Important:** The accordion will fail gracefully and log errors if any required attributes are missing.
+
+### Integration
+
+1. **Add the script to your Webflow page:**
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/YOUR-USERNAME/automatic-accordion@v0.0.1/dist/index.js"></script>
+```
+
+2. **Add multiple accordion items** with the structure shown above
+
+3. **The accordion will automatically:**
+   - Activate the first tab on page load
+   - Display a smooth progress bar animating from 0% to 100% over 10 seconds
+   - Automatically cycle to the next tab every 10 seconds
+   - Loop back to the first tab after the last one
+
+### Customization
+
+**Timing:**
+To change the tab duration, modify `TAB_DURATION` in `src/utils/accordion-animation.ts`:
+
+```typescript
+private readonly TAB_DURATION = 10000; // milliseconds
+```
+
+**Styling:**
+Customize the appearance in `src/styles/accordion-animations.css`:
+
+- Progress bar colors and height
+- Active/inactive states
+- Transition speeds
+- Hover effects
+
+**Manual Control:**
+Access the accordion controller to manually control behavior:
+
+```javascript
+// Example: Stop auto-cycling
+accordionController.stop();
+
+// Go to specific tab (0-indexed)
+accordionController.goToAccordion(2);
+
+// Destroy the accordion
+accordionController.destroy();
+```
 
 ## Included tools
 

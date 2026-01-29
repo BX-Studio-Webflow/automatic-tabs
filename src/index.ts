@@ -1,8 +1,10 @@
-import { NavbarAnimationController } from '$utils/navbar-animation';
+import './styles/accordion-animations.css';
+
+import { AccordionController } from '$utils/accordion-animation';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  // Initialize navbar animations
-  const navbarController = new NavbarAnimationController();
-  navbarController.init();
+  // Initialize automatic accordion
+  const accordionController = new AccordionController();
+  accordionController.init();
 });

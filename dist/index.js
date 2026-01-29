@@ -3,96 +3,152 @@
   // bin/live-reload.js
   new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
 
-  // src/utils/navbar-animation.ts
-  var NavbarAnimationController = class {
+  // src/utils/accordion-animation.ts
+  var AccordionController = class {
+    accordions = [];
     state = {
-      current: null,
-      previous: null
+      currentIndex: 0,
+      intervalId: null,
+      animationFrameId: null
     };
-    dropdownOrder = ["products", "solutions", "resources", "company"];
+    TAB_DURATION = 1e4;
+    // 10 seconds in milliseconds
+    progressStartTime = 0;
     /**
-     * Initialize the navbar animation controller
+     * Initialize the accordion controller
      */
     init() {
-      const toggles = [
-        { element: document.querySelector('[dev-target="products-toggle"]'), name: "products" },
-        { element: document.querySelector('[dev-target="solutions-toggle"]'), name: "solutions" },
-        { element: document.querySelector('[dev-target="resources-toggle"]'), name: "resources" },
-        { element: document.querySelector('[dev-target="company-toggle"]'), name: "company" }
-      ];
-      toggles.forEach(({ element: toggle, name: dropdownName }) => {
-        if (!toggle) {
-          console.error(`Toggle not found for ${dropdownName}`);
+      const accordionElements = document.querySelectorAll('[dev-target="accordion"]');
+      if (!accordionElements || accordionElements.length === 0) {
+        console.error('No accordion elements found with [dev-target="accordion"]');
+        return;
+      }
+      accordionElements.forEach((accordion, index) => {
+        if (!(accordion instanceof HTMLElement)) {
+          console.error(`Accordion at index ${index} is not an HTMLElement`);
           return;
         }
-        const dropdown = toggle.closest(".nav_menu-dropdown");
-        if (!dropdown) {
-          console.error(`Dropdown container not found for ${dropdownName}`);
+        const title = accordion.querySelector('[dev-target="accordion-title"]');
+        const message = accordion.querySelector('[dev-target="accordion-message"]');
+        const track = accordion.querySelector('[dev-target="accordion-animation-track"]');
+        const fill = accordion.querySelector('[dev-target="accordion-animation-fill"]');
+        if (!title) {
+          console.error(`Accordion at index ${index} is missing [dev-target="accordion-title"]`);
           return;
         }
-        const content = dropdown.querySelector(".nav_dropdown-content, .navbar_dropdown-content");
-        if (!content) {
-          console.error(`Dropdown content not found for ${dropdownName}`);
+        if (!message) {
+          console.error(`Accordion at index ${index} is missing [dev-target="accordion-message"]`);
           return;
         }
-        toggle.addEventListener("mouseenter", () => {
-          this.handleDropdownEnter(dropdownName, content);
-        });
-        dropdown.addEventListener("mouseleave", () => {
-          this.handleDropdownLeave(dropdownName);
-        });
+        if (!track) {
+          console.error(
+            `Accordion at index ${index} is missing [dev-target="accordion-animation-track"]`
+          );
+          return;
+        }
+        if (!fill) {
+          console.error(
+            `Accordion at index ${index} is missing [dev-target="accordion-animation-fill"]`
+          );
+          return;
+        }
+        this.accordions.push(accordion);
       });
+      if (this.accordions.length === 0) {
+        console.error("No valid accordions found after validation");
+        return;
+      }
+      this.activateAccordion(0);
+      this.startAutoCycle();
     }
     /**
-     * Handle dropdown enter event
+     * Activate a specific accordion by index
      */
-    handleDropdownEnter(dropdownName, contentElement) {
-      const direction = this.getAnimationDirection(dropdownName);
-      contentElement.classList.remove(
-        "slide-from-left",
-        "slide-from-right",
-        "slide-out-left",
-        "slide-out-right"
+    activateAccordion(index) {
+      this.accordions.forEach((accordion) => {
+        const fill = accordion.querySelector(
+          '[dev-target="accordion-animation-fill"]'
+        );
+        if (fill) {
+          fill.style.width = "0%";
+        }
+        accordion.classList.remove("is-active");
+      });
+      const activeAccordion = this.accordions[index];
+      activeAccordion.classList.add("is-active");
+      this.state.currentIndex = index;
+      this.startProgressAnimation();
+    }
+    /**
+     * Start the smooth progress bar animation
+     */
+    startProgressAnimation() {
+      if (this.state.animationFrameId !== null) {
+        cancelAnimationFrame(this.state.animationFrameId);
+      }
+      const activeAccordion = this.accordions[this.state.currentIndex];
+      const fill = activeAccordion.querySelector(
+        '[dev-target="accordion-animation-fill"]'
       );
-      if (direction === "left") {
-        contentElement.classList.add("slide-from-left");
-      } else if (direction === "right") {
-        contentElement.classList.add("slide-from-right");
-      }
-      this.state.previous = this.state.current;
-      this.state.current = dropdownName;
+      if (!fill) return;
+      this.progressStartTime = performance.now();
+      const animate = (currentTime) => {
+        const elapsed = currentTime - this.progressStartTime;
+        const progress = Math.min(elapsed / this.TAB_DURATION, 1);
+        const percentage = progress * 100;
+        fill.style.width = `${percentage}%`;
+        if (progress < 1) {
+          this.state.animationFrameId = requestAnimationFrame(animate);
+        }
+      };
+      this.state.animationFrameId = requestAnimationFrame(animate);
     }
     /**
-     * Handle dropdown leave event
+     * Start automatic cycling through accordion tabs
      */
-    handleDropdownLeave(dropdownName) {
-      if (this.state.current === dropdownName) {
-        this.state.previous = this.state.current;
-        this.state.current = null;
+    startAutoCycle() {
+      this.state.intervalId = window.setInterval(() => {
+        const nextIndex = (this.state.currentIndex + 1) % this.accordions.length;
+        this.activateAccordion(nextIndex);
+      }, this.TAB_DURATION);
+    }
+    /**
+     * Stop automatic cycling
+     */
+    stop() {
+      if (this.state.intervalId !== null) {
+        clearInterval(this.state.intervalId);
+        this.state.intervalId = null;
+      }
+      if (this.state.animationFrameId !== null) {
+        cancelAnimationFrame(this.state.animationFrameId);
+        this.state.animationFrameId = null;
       }
     }
     /**
-     * Determine animation direction based on dropdown order
+     * Manually go to a specific accordion index
      */
-    getAnimationDirection(currentDropdown) {
-      if (!this.state.previous) return "none";
-      const currentIndex = this.dropdownOrder.indexOf(currentDropdown);
-      const previousIndex = this.dropdownOrder.indexOf(this.state.previous);
-      if (currentIndex > previousIndex) {
-        return "right";
+    goToAccordion(index) {
+      if (index < 0 || index >= this.accordions.length) {
+        console.error(`Invalid accordion index: ${index}`);
+        return;
       }
-      if (currentIndex < previousIndex) {
-        return "left";
+      if (this.state.intervalId !== null) {
+        clearInterval(this.state.intervalId);
       }
-      return "none";
+      this.activateAccordion(index);
+      this.startAutoCycle();
     }
     /**
-     * Reset the animation state
+     * Clean up and destroy the accordion controller
      */
-    reset() {
+    destroy() {
+      this.stop();
+      this.accordions = [];
       this.state = {
-        current: null,
-        previous: null
+        currentIndex: 0,
+        intervalId: null,
+        animationFrameId: null
       };
     }
   };
@@ -100,8 +156,8 @@
   // src/index.ts
   window.Webflow ||= [];
   window.Webflow.push(() => {
-    const navbarController = new NavbarAnimationController();
-    navbarController.init();
+    const accordionController = new AccordionController();
+    accordionController.init();
   });
 })();
 //# sourceMappingURL=index.js.map
