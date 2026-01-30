@@ -64,7 +64,10 @@ export class AccordionController {
         );
         return;
       }
-
+      //setup click to set active accordion
+      accordion.addEventListener('click', () => {
+        this.goToAccordion(index);
+      });
       this.accordions.push(accordion);
     });
 
