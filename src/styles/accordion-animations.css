@@ -19,7 +19,6 @@
 
 [dev-target="accordion"]:not(.is-active) [dev-target="accordion-message"] {
   opacity: 0.5;
-  display: none;
 }
 
 
