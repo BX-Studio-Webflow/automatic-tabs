@@ -55,12 +55,6 @@
      */
     activateAccordion(index) {
       this.accordions.forEach((accordion) => {
-        const fill = accordion.querySelector(
-          '[dev-target="accordion-animation-fill"]'
-        );
-        if (fill) {
-          fill.style.width = "0%";
-        }
         accordion.classList.remove("is-active");
       });
       const activeAccordion = this.accordions[index];
@@ -75,17 +69,10 @@
       if (this.state.animationFrameId !== null) {
         cancelAnimationFrame(this.state.animationFrameId);
       }
-      const activeAccordion = this.accordions[this.state.currentIndex];
-      const fill = activeAccordion.querySelector(
-        '[dev-target="accordion-animation-fill"]'
-      );
-      if (!fill) return;
       this.progressStartTime = performance.now();
       const animate = (currentTime) => {
         const elapsed = currentTime - this.progressStartTime;
         const progress = Math.min(elapsed / this.TAB_DURATION, 1);
-        const percentage = progress * 100;
-        fill.style.width = `${percentage}%`;
         if (progress < 1) {
           this.state.animationFrameId = requestAnimationFrame(animate);
         }

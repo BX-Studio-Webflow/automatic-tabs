@@ -76,12 +76,6 @@ export class AccordionController {
   private activateAccordion(index: number): void {
     // Deactivate all accordions
     this.accordions.forEach((accordion) => {
-      const fill = accordion.querySelector(
-        '[dev-target="accordion-animation-fill"]'
-      ) as HTMLElement;
-      if (fill) {
-        fill.style.width = '0%';
-      }
       accordion.classList.remove('is-active');
     });
 
@@ -105,13 +99,6 @@ export class AccordionController {
       cancelAnimationFrame(this.state.animationFrameId);
     }
 
-    const activeAccordion = this.accordions[this.state.currentIndex];
-    const fill = activeAccordion.querySelector(
-      '[dev-target="accordion-animation-fill"]'
-    ) as HTMLElement;
-
-    if (!fill) return;
-
     // Record start time
     this.progressStartTime = performance.now();
 
@@ -119,9 +106,6 @@ export class AccordionController {
     const animate = (currentTime: number) => {
       const elapsed = currentTime - this.progressStartTime;
       const progress = Math.min(elapsed / this.TAB_DURATION, 1); // 0 to 1
-      const percentage = progress * 100;
-
-      fill.style.width = `${percentage}%`;
 
       // Continue animation if not complete
       if (progress < 1) {
