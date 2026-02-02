@@ -41,8 +41,6 @@ export class AccordionController {
       // Validate required child elements
       const title = accordion.querySelector('[dev-target="accordion-title"]');
       const message = accordion.querySelector('[dev-target="accordion-message"]');
-      const track = accordion.querySelector('[dev-target="accordion-animation-track"]');
-      const fill = accordion.querySelector('[dev-target="accordion-animation-fill"]');
 
       if (!title) {
         console.error(`Accordion at index ${index} is missing [dev-target="accordion-title"]`);
@@ -52,18 +50,7 @@ export class AccordionController {
         console.error(`Accordion at index ${index} is missing [dev-target="accordion-message"]`);
         return;
       }
-      if (!track) {
-        console.error(
-          `Accordion at index ${index} is missing [dev-target="accordion-animation-track"]`
-        );
-        return;
-      }
-      if (!fill) {
-        console.error(
-          `Accordion at index ${index} is missing [dev-target="accordion-animation-fill"]`
-        );
-        return;
-      }
+
       //setup click to set active accordion
       accordion.addEventListener('click', () => {
         this.goToAccordion(index);
